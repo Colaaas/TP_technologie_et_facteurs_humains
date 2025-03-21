@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pong Solo</title>
+    <title>Pong avec Pomme</title>
     <style>
         body {
             margin: 0;
@@ -17,10 +17,26 @@
         canvas {
             background: #222;
         }
+        #replayButton {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        #replayButton:hover {
+            background-color: #ddd;
+        }
     </style>
 </head>
 <body>
     <canvas id="pong"></canvas>
+    <button id="replayButton">Rejouer</button>
     <script src="script.js"></script>
 </body>
 </html>

@@ -1,8 +1,8 @@
 const canvas = document.getElementById("pong");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 800;
-canvas.height = 500;
+canvas.width = 1000;  // Agrandir le cadre
+canvas.height = 600;
 
 const paddle = {
     width: 100,
@@ -10,7 +10,7 @@ const paddle = {
     x: canvas.width / 2 - 50,
     y: canvas.height - 20,
     color: "white",
-    speed: 6, // Vitesse de déplacement de la raquette
+    speed: 5, // Vitesse réduite de la raquette
     dx: 0 // Vitesse horizontale de la raquette
 };
 
@@ -18,26 +18,37 @@ const ball = {
     x: canvas.width / 2,
     y: canvas.height / 2,
     radius: 8,
-    speedX: 2,
-    speedY: -2,
+    speedX: 2,  // Vitesse divisée par 2
+    speedY: -2, // Vitesse divisée par 2
     color: "red"
 };
 
-// Écouter les événements de pression des touches
+const apple = {
+    x: Math.random() * (canvas.width - 50),
+    y: Math.random() * (canvas.height - 50),
+    radius: 30,  // Pomme beaucoup plus grande
+    color: "green"
+};
+
+let score = 0;
+let gameOver = false;
+
+const replayButton = document.getElementById("replayButton");
+
 document.addEventListener("keydown", movePaddle);
 document.addEventListener("keyup", stopPaddle);
 
 function movePaddle(e) {
     if (e.key === "ArrowRight") {
-        paddle.dx = paddle.speed; // Déplace la raquette vers la droite
+        paddle.dx = paddle.speed;
     } else if (e.key === "ArrowLeft") {
-        paddle.dx = -paddle.speed; // Déplace la raquette vers la gauche
+        paddle.dx = -paddle.speed;
     }
 }
 
 function stopPaddle(e) {
     if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-        paddle.dx = 0; // Arrêter la raquette lorsqu'on relâche la touche
+        paddle.dx = 0;
     }
 }
 
@@ -60,18 +71,20 @@ function resetBall() {
     ball.speedY = -2;
 }
 
+function spawnApple() {
+    apple.x = Math.random() * (canvas.width - 50);
+    apple.y = Math.random() * (canvas.height - 50);
+}
+
 function update() {
     ball.x += ball.speedX;
     ball.y += ball.speedY;
 
-    // Mouvements de la raquette
     paddle.x += paddle.dx;
 
-    // Limiter les déplacements de la raquette pour ne pas sortir de l'écran
     if (paddle.x < 0) paddle.x = 0;
     if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
 
-    // Collision avec les murs
     if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
         ball.speedX *= -1;
     }
@@ -80,7 +93,6 @@ function update() {
         ball.speedY *= -1;
     }
 
-    // Collision avec la raquette
     if (
         ball.y + ball.radius > paddle.y &&
         ball.x > paddle.x &&
@@ -89,9 +101,17 @@ function update() {
         ball.speedY *= -1;
     }
 
-    // Reset la balle si elle touche le bas de l'écran
     if (ball.y + ball.radius > canvas.height) {
-        resetBall();
+        gameOver = true;
+        replayButton.style.display = "block";
+    }
+
+    // Collision avec la pomme
+    const dist = Math.sqrt((ball.x - apple.x) ** 2 + (ball.y - apple.y) ** 2);
+    if (dist < ball.radius + apple.radius) {
+        score++;
+        spawnApple();
+        setTimeout(() => {}, 500); // Délai de 0.5s avant de réapparaître
     }
 }
 
@@ -99,12 +119,34 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawRect(paddle.x, paddle.y, paddle.width, paddle.height, paddle.color);
     drawCircle(ball.x, ball.y, ball.radius, ball.color);
+    drawCircle(apple.x, apple.y, apple.radius, apple.color);
+
+    // Afficher le score
+    ctx.font = "24px Arial";
+    ctx.fillStyle = "white";
+    ctx.fillText("Score: " + score, 20, 30);
 }
 
 function gameLoop() {
-    update();
-    draw();
-    requestAnimationFrame(gameLoop);
+    if (!gameOver) {
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
 }
 
+function restartGame() {
+    score = 0;
+    ball.speedX = 2;
+    ball.speedY = -2;
+    ball.x = canvas.width / 2;
+    ball.y = canvas.height / 2;
+    gameOver = false;
+    replayButton.style.display = "none";
+    gameLoop();
+}
+
+replayButton.addEventListener("click", restartGame);
+
 gameLoop();
+
