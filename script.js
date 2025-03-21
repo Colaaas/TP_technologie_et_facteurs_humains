@@ -10,7 +10,7 @@ const paddle = {
     x: canvas.width / 2 - 50,
     y: canvas.height - 20,
     color: "white",
-    speed: 5, // Vitesse réduite de la raquette
+    speed: 3, // Vitesse réduite de la raquette
     dx: 0 // Vitesse horizontale de la raquette
 };
 
@@ -26,8 +26,8 @@ const ball = {
 const apple = {
     x: Math.random() * (canvas.width - 50),
     y: Math.random() * (canvas.height - 50),
-    radius: 30,  // Pomme beaucoup plus grande
-    color: "green"
+    radius: 30,
+    color: "yellow"
 };
 
 let score = 0;
@@ -93,12 +93,21 @@ function update() {
         ball.speedY *= -1;
     }
 
+    // Collision avec la raquette avec modification de la direction en fonction de l'endroit de la collision
     if (
         ball.y + ball.radius > paddle.y &&
         ball.x > paddle.x &&
         ball.x < paddle.x + paddle.width
     ) {
-        ball.speedY *= -1;
+        // Calcul de la position de collision sur la raquette
+        let relativeIntersectX = ball.x - (paddle.x + paddle.width / 2);
+        let normalizedRelativeIntersectionX = relativeIntersectX / (paddle.width / 2);
+        let angle = normalizedRelativeIntersectionX * (Math.PI / 4); // L'angle change en fonction de la collision sur la raquette
+
+        // Modifie la direction de la balle en fonction de l'angle
+        ball.speedX = 3 * Math.sin(angle);  // Augmente la vitesse horizontale en fonction de l'angle
+        ball.speedY = -Math.abs(3 * Math.cos(angle)); // La balle se dirige vers le haut avec une vitesse ajustée
+
     }
 
     if (ball.y + ball.radius > canvas.height) {
@@ -149,4 +158,3 @@ function restartGame() {
 replayButton.addEventListener("click", restartGame);
 
 gameLoop();
-
