@@ -10,8 +10,15 @@ const paddle = {
     x: canvas.width / 2 - 50,
     y: canvas.height - 20,
     color: "white",
-    speed: 3, // Vitesse réduite de la raquette
+    speed: 5, // Vitesse réduite de la raquette
     dx: 0 // Vitesse horizontale de la raquette
+};
+
+// Hitbox de la raquette (largement plus grande)
+const paddleHitbox = {
+    width: paddle.width * 1.5, // Hitbox de la raquette plus large
+    height: paddle.height,
+    offsetX: (paddle.width * 1.5 - paddle.width) / 2 // Décalage horizontal pour centrer la hitbox
 };
 
 const ball = {
@@ -26,8 +33,8 @@ const ball = {
 const apple = {
     x: Math.random() * (canvas.width - 50),
     y: Math.random() * (canvas.height - 50),
-    radius: 30,
-    color: "yellow"
+    radius: 30,  // Pomme beaucoup plus grande
+    color: "yellow"  // Pomme en jaune
 };
 
 let score = 0;
@@ -37,6 +44,7 @@ const replayButton = document.getElementById("replayButton");
 
 document.addEventListener("keydown", movePaddle);
 document.addEventListener("keyup", stopPaddle);
+document.addEventListener("keydown", handleKeyPress);
 
 function movePaddle(e) {
     if (e.key === "ArrowRight") {
@@ -49,6 +57,13 @@ function movePaddle(e) {
 function stopPaddle(e) {
     if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
         paddle.dx = 0;
+    }
+}
+
+// Nouvelle fonction pour gérer l'appui sur la touche "Entrer"
+function handleKeyPress(e) {
+    if (e.key === "Enter" && gameOver) {
+        restartGame();
     }
 }
 
@@ -96,8 +111,8 @@ function update() {
     // Collision avec la raquette avec modification de la direction en fonction de l'endroit de la collision
     if (
         ball.y + ball.radius > paddle.y &&
-        ball.x > paddle.x &&
-        ball.x < paddle.x + paddle.width
+        ball.x > paddle.x - paddleHitbox.offsetX &&
+        ball.x < paddle.x + paddle.width + paddleHitbox.offsetX
     ) {
         // Calcul de la position de collision sur la raquette
         let relativeIntersectX = ball.x - (paddle.x + paddle.width / 2);
@@ -107,7 +122,6 @@ function update() {
         // Modifie la direction de la balle en fonction de l'angle
         ball.speedX = 3 * Math.sin(angle);  // Augmente la vitesse horizontale en fonction de l'angle
         ball.speedY = -Math.abs(3 * Math.cos(angle)); // La balle se dirige vers le haut avec une vitesse ajustée
-
     }
 
     if (ball.y + ball.radius > canvas.height) {
@@ -126,6 +140,7 @@ function update() {
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Dessiner la raquette visible
     drawRect(paddle.x, paddle.y, paddle.width, paddle.height, paddle.color);
     drawCircle(ball.x, ball.y, ball.radius, ball.color);
     drawCircle(apple.x, apple.y, apple.radius, apple.color);
