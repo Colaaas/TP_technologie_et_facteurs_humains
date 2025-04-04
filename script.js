@@ -1,8 +1,25 @@
 const canvas = document.getElementById("pong");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 1000;  // Agrandir le cadre
+const startButton = document.getElementById("startButton");
+const speedSlider = document.getElementById("speedSlider");
+
+canvas.width = 1000;
 canvas.height = 600;
+
+let speed1 = parseInt(speedSlider.value); // Vitesse par défaut de la et de la balle
+
+speedSlider.addEventListener("input", function () {
+    speed1 = parseInt(speedSlider.value);
+});
+
+startButton.addEventListener("click", function () {
+    speed1 = parseInt(speedSlider.value); // Prendre la vitesse choisie
+    startButton.style.display = "none"; // Cacher le bouton après le démarrage
+    replayButton.style.display = "none"; // Cacher le bouton de replay s'il était affiché
+    gameOver = false; // S'assurer que la partie n'est pas en état "game over"
+    restartGame(); // Lancer la partie proprement
+});
 
 const paddle = {
     width: 100,
@@ -10,23 +27,23 @@ const paddle = {
     x: canvas.width / 2 - 50,
     y: canvas.height - 20,
     color: "white",
-    speed: 9, // Vitesse de la raquette
+    speed: speed1, // Vitesse de la raquette
     dx: 0 // Vitesse horizontale de la raquette
 };
 
 // Hitbox de la raquette
 const paddleHitbox = {
-    width: paddle.width * 1.5, // Hitbox de la raquette plus large
+    width: paddle.width * 1.3, // Hitbox de la raquette plus large
     height: paddle.height,
-    offsetX: (paddle.width * 1.5 - paddle.width) / 2 // Décalage horizontal pour centrer la hitbox
+    offsetX: (paddle.width * 1.3 - paddle.width) / 2 // Décalage horizontal pour centrer la hitbox
 };
 
 const ball = {
     x: canvas.width / 2,
     y: canvas.height / 2,
     radius: 8,
-    speedX: 5,
-    speedY: -5,
+    speedX: speed1,
+    speedY: -speed1,
     color: "red"
 };
 
@@ -82,8 +99,8 @@ function drawCircle(x, y, r, color) {
 function resetBall() {
     ball.x = canvas.width / 2;
     ball.y = canvas.height / 2;
-    ball.speedX = 5 * (Math.random() > 0.5 ? 1 : -1);
-    ball.speedY = -5;
+    ball.speedX = speed1 * (Math.random() > 0.5 ? 1 : -1);
+    ball.speedY = -speed1;
 }
 
 function spawnApple() {
@@ -120,8 +137,8 @@ function update() {
         let angle = normalizedRelativeIntersectionX * (Math.PI / 4); // L'angle change en fonction de la collision sur la raquette
 
         // Modifie la direction de la balle en fonction de l'angle
-        ball.speedX = 8 * Math.sin(angle);  // Augmente la vitesse horizontale en fonction de l'angle
-        ball.speedY = -Math.abs(8 * Math.cos(angle)); // La balle se dirige vers le haut avec une vitesse ajustée
+        ball.speedX = (speed1*1.5) * Math.sin(angle);  // Augmente la vitesse horizontale en fonction de l'angle
+        ball.speedY = -Math.abs((speed1*1.5) * Math.cos(angle)); // La balle se dirige vers le haut avec une vitesse ajustée
     }
 
     if (ball.y + ball.radius > canvas.height) {
@@ -160,16 +177,14 @@ function gameLoop() {
 }
 
 function restartGame() {
+    speed1 = parseInt(speedSlider.value); // Mettre à jour la vitesse
     score = 0;
-    ball.speedX = 5;
-    ball.speedY = -5;
-    ball.x = canvas.width / 2;
-    ball.y = canvas.height / 2;
+    resetBall();
     gameOver = false;
     replayButton.style.display = "none";
-    gameLoop();
+    gameLoop(); // Lancer la boucle de jeu
 }
+
 
 replayButton.addEventListener("click", restartGame);
 
-gameLoop();
