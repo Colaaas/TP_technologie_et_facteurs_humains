@@ -10,11 +10,11 @@ const paddle = {
     x: canvas.width / 2 - 50,
     y: canvas.height - 20,
     color: "white",
-    speed: 5, // Vitesse réduite de la raquette
+    speed: 9, // Vitesse de la raquette
     dx: 0 // Vitesse horizontale de la raquette
 };
 
-// Hitbox de la raquette (largement plus grande)
+// Hitbox de la raquette
 const paddleHitbox = {
     width: paddle.width * 1.5, // Hitbox de la raquette plus large
     height: paddle.height,
@@ -25,16 +25,16 @@ const ball = {
     x: canvas.width / 2,
     y: canvas.height / 2,
     radius: 8,
-    speedX: 2,  // Vitesse divisée par 2
-    speedY: -2, // Vitesse divisée par 2
+    speedX: 5,
+    speedY: -5,
     color: "red"
 };
 
 const apple = {
     x: Math.random() * (canvas.width - 50),
     y: Math.random() * (canvas.height - 50),
-    radius: 30,  // Pomme beaucoup plus grande
-    color: "yellow"  // Pomme en jaune
+    radius: 30,
+    color: "yellow"
 };
 
 let score = 0;
@@ -82,8 +82,8 @@ function drawCircle(x, y, r, color) {
 function resetBall() {
     ball.x = canvas.width / 2;
     ball.y = canvas.height / 2;
-    ball.speedX = 2 * (Math.random() > 0.5 ? 1 : -1);
-    ball.speedY = -2;
+    ball.speedX = 5 * (Math.random() > 0.5 ? 1 : -1);
+    ball.speedY = -5;
 }
 
 function spawnApple() {
@@ -120,8 +120,8 @@ function update() {
         let angle = normalizedRelativeIntersectionX * (Math.PI / 4); // L'angle change en fonction de la collision sur la raquette
 
         // Modifie la direction de la balle en fonction de l'angle
-        ball.speedX = 3 * Math.sin(angle);  // Augmente la vitesse horizontale en fonction de l'angle
-        ball.speedY = -Math.abs(3 * Math.cos(angle)); // La balle se dirige vers le haut avec une vitesse ajustée
+        ball.speedX = 8 * Math.sin(angle);  // Augmente la vitesse horizontale en fonction de l'angle
+        ball.speedY = -Math.abs(8 * Math.cos(angle)); // La balle se dirige vers le haut avec une vitesse ajustée
     }
 
     if (ball.y + ball.radius > canvas.height) {
@@ -161,8 +161,8 @@ function gameLoop() {
 
 function restartGame() {
     score = 0;
-    ball.speedX = 2;
-    ball.speedY = -2;
+    ball.speedX = 5;
+    ball.speedY = -5;
     ball.x = canvas.width / 2;
     ball.y = canvas.height / 2;
     gameOver = false;
