@@ -47,16 +47,16 @@ const ball = {
 };
 
 const apples = [
+    { x: 0, y: 0, radius: 30, color: "lightgreen" },
+    { x: 0, y: 0, radius: 30, color: "lightgreen" },
+    { x: 0, y: 0, radius: 30, color: "lightgreen" },
+    { x: 0, y: 0, radius: 30, color: "lightgreen" },
+    { x: 0, y: 0, radius: 30, color: "lightgreen" },
+    { x: 0, y: 0, radius: 30, color: "lightgreen" },
+    { x: 0, y: 0, radius: 30, color: "lightgreen" },
+    { x: 0, y: 0, radius: 30, color: "lightgreen" },
+    { x: 0, y: 0, radius: 30, color: "lightgreen" },
     { x: 0, y: 0, radius: 30, color: "yellow" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" }
 ];
 
 
@@ -117,8 +117,8 @@ function resetBall() {
 }
 
 function spawnApple(apple) {
-    apple.x = 3 + Math.random() * (canvas.width - 44);
-    apple.y = 5 + Math.random() * (canvas.height - 43);
+    apple.x = Math.random() * (canvas.width - 50);
+    apple.y = Math.random() * (canvas.height - 50);
 }
 
 function spawnApples() {
@@ -176,8 +176,15 @@ function update() {
             } else {
                 score++;
             }
-            apple.x = Math.random() * (canvas.width - 50);
-            apple.y = Math.random() * (canvas.height - 50);
+
+            // Temporarily hide the apple and respawn it after 1 second
+            const appleToRespawn = apple;
+            appleToRespawn.x = -100; // Move it off-screen temporarily
+            appleToRespawn.y = -100;
+
+            setTimeout(() => {
+                spawnApple(apple);
+            }, 1000); // 1 second delay
         }
     });
 }
