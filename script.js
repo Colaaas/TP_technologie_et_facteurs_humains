@@ -3,9 +3,12 @@ const ctx = canvas.getContext("2d");
 
 const startButton = document.getElementById("startButton");
 const speedSlider = document.getElementById("speedSlider");
+const replayButton = document.getElementById("replayButton");
 
 canvas.width = 1000;
 canvas.height = 600;
+
+startState = true;
 
 let speed1 = parseInt(speedSlider.value); // Vitesse par défaut de la et de la balle
 
@@ -14,11 +17,7 @@ speedSlider.addEventListener("input", function () {
 });
 
 startButton.addEventListener("click", function () {
-    speed1 = parseInt(speedSlider.value); // Prendre la vitesse choisie
-    startButton.style.display = "none"; // Cacher le bouton après le démarrage
-    replayButton.style.display = "none"; // Cacher le bouton de replay s'il était affiché
-    gameOver = false; // S'assurer que la partie n'est pas en état "game over"
-    restartGame(); // Lancer la partie proprement
+    startgame();
 });
 
 const paddle = {
@@ -35,7 +34,7 @@ const paddle = {
 const paddleHitbox = {
     width: paddle.width * 1.3, // Hitbox de la raquette plus large
     height: paddle.height,
-    offsetX: (paddle.width * 1.3 - paddle.width) / 2 // Décalage horizontal pour centrer la hitbox
+    offsetX: (paddle.width * 1.5 - paddle.width) / 2 // Décalage horizontal pour centrer la hitbox
 };
 
 const ball = {
@@ -57,11 +56,16 @@ const apple = {
 let score = 0;
 let gameOver = false;
 
-const replayButton = document.getElementById("replayButton");
 
 document.addEventListener("keydown", movePaddle);
 document.addEventListener("keyup", stopPaddle);
 document.addEventListener("keydown", handleKeyPress);
+
+function startgame() {
+    startButton.style.display = "none";
+    startState = false;
+    restartGame();
+}
 
 function movePaddle(e) {
     if (e.key === "ArrowRight") {
@@ -81,6 +85,9 @@ function stopPaddle(e) {
 function handleKeyPress(e) {
     if (e.key === "Enter" && gameOver) {
         restartGame();
+    }
+    if (e.key==="Enter" && startState) {
+        startgame();
     }
 }
 
@@ -111,6 +118,8 @@ function spawnApple() {
 function update() {
     ball.x += ball.speedX;
     ball.y += ball.speedY;
+
+    paddle.speed = speed1;
 
     paddle.x += paddle.dx;
 
@@ -143,7 +152,7 @@ function update() {
 
     if (ball.y + ball.radius > canvas.height) {
         gameOver = true;
-        replayButton.style.display = "block";
+        replayButton.style.display = "block"; // Afficher le bouton de redémarrage
     }
 
     // Collision avec la pomme
@@ -181,7 +190,7 @@ function restartGame() {
     score = 0;
     resetBall();
     gameOver = false;
-    replayButton.style.display = "none";
+    replayButton.style.display = "none"; // Cacher le bouton de redémarrage
     gameLoop(); // Lancer la boucle de jeu
 }
 

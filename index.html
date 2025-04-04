@@ -3,47 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pong avec Pomme</title>
-    <style>
-        body {
-            margin: 0;
-            background: black;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        canvas {
-            background: #222;
-        }
-        #replayButton {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #fff;
-            border: none;
-            cursor: pointer;
-        }
-        #replayButton:hover {
-            background-color: #ddd;
-        }
-    </style>
+    <title>Pong</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div>
-        <label for="speedSlider" style="color: white;">Vitesse :</label>
-        <input type="range" id="speedSlider" min="1" max="10" value="2">
+    <div id="gameContainer">
+        <canvas id="pong"></canvas>
+        <div id="controls">
+            <label for="speedSlider">Vitesse :</label>
+            <input type="range" id="speedSlider" min="1" max="7" value="2" step="1">
+            <div id="buttonContainer">
+                <button id="startButton">Lancer la partie</button>
+                <button id="replayButton" style="display: none;">Rejouer</button>
+            </div>
+        </div>
     </div>
-    <div>
-        <button id="startButton">Lancer la partie</button>
-    </div>
-    <canvas id="pong"></canvas>
-    <button id="replayButton">Rejouer</button>
+
     <script src="script.js"></script>
 </body>
 </html>
