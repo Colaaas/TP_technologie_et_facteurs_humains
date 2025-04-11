@@ -10,7 +10,7 @@ canvas.height = 600;
 
 startState = true;
 
-let speed1 = parseInt(speedSlider.value); // Vitesse par défaut de la et de la balle
+let speed1 = parseInt(speedSlider.value); // Vitesse par défaut de la balle
 
 speedSlider.addEventListener("input", function () {
     speed1 = parseInt(speedSlider.value);
@@ -20,80 +20,182 @@ startButton.addEventListener("click", function () {
     startgame();
 });
 
-const paddle = {
-    width: 100,
-    height: 10,
-    x: canvas.width / 2 - 50,
-    y: canvas.height - 20,
+// Joueur 1 (à gauche)
+const paddle1 = {
+    width: 10,
+    height: 100,
+    x: 20, // Position à gauche
+    y: canvas.height / 2 - 50,
     color: "white",
-    speed: speed1, // Vitesse de la raquette
-    dx: 0 // Vitesse horizontale de la raquette
+    speed: speed1 + 1.2,
+    dy: 0, // Vitesse verticale
+    hitbox: {
+        width: 10,
+        height: 120, // Hitbox légèrement plus grande
+        offsetY: -10 // Décalage vertical pour centrer la hitbox
+    }
 };
 
-// Hitbox de la raquette
-const paddleHitbox = {
-    width: paddle.width * 1.3, // Hitbox de la raquette plus large
-    height: paddle.height,
-    offsetX: (paddle.width * 1.5 - paddle.width) / 2 // Décalage horizontal pour centrer la hitbox
+// Joueur 2 (à droite)
+const paddle2 = {
+    width: 10,
+    height: 100,
+    x: canvas.width - 30, // Position à droite
+    y: canvas.height / 2 - 50,
+    color: "white",
+    speed: speed1 + 1.2,
+    dy: 0, // Vitesse verticale
+    hitbox: {
+        width: 10,
+        height: 120, // Hitbox légèrement plus grande
+        offsetY: -10 // Décalage vertical pour centrer la hitbox
+    }
 };
 
 const ball = {
     x: canvas.width / 2,
     y: canvas.height / 2,
     radius: 8,
-    speedX: speed1,
-    speedY: -speed1,
+    speedX: speed1 * (Math.random() > 0.5 ? 1 : -1),
+    speedY: speed1 * (Math.random() > 0.5 ? 1 : -1),
     color: "red"
 };
 
-const apples = [
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "lightgreen" },
-    { x: 0, y: 0, radius: 30, color: "yellow" },
-];
-
-
-let score = 0;
+let score1 = 0; // Score du joueur 1
+let score2 = 0; // Score du joueur 2
 let gameOver = false;
 
+document.addEventListener("keydown", movePaddles);
+document.addEventListener("keyup", stopPaddles);
 
-document.addEventListener("keydown", movePaddle);
-document.addEventListener("keyup", stopPaddle);
-document.addEventListener("keydown", handleKeyPress);
+function movePaddles(e) {
+    // Joueur 1 (z et s)
+    if (e.key === "z") {
+        paddle1.dy = -paddle1.speed;
+    } else if (e.key === "s") {
+        paddle1.dy = paddle1.speed;
+    }
 
-function startgame() {
-    startButton.style.display = "none";
-    startState = false;
-    restartGame();
-}
-
-function movePaddle(e) {
-    if (e.key === "ArrowRight") {
-        paddle.dx = paddle.speed;
-    } else if (e.key === "ArrowLeft") {
-        paddle.dx = -paddle.speed;
+    // Joueur 2 (flèches haut et bas)
+    if (e.key === "ArrowUp") {
+        paddle2.dy = -paddle2.speed;
+    } else if (e.key === "ArrowDown") {
+        paddle2.dy = paddle2.speed;
     }
 }
 
-function stopPaddle(e) {
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-        paddle.dx = 0;
+function stopPaddles(e) {
+    if (e.key === "z" || e.key === "s") {
+        paddle1.dy = 0;
+    }
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        paddle2.dy = 0;
     }
 }
 
-function handleKeyPress(e) {
-    if (e.key === "Enter" && gameOver) {
-        restartGame();
+function resetBall() {
+    ball.x = canvas.width / 2;
+    ball.y = canvas.height / 2;
+    ball.speedX = speed1 * (Math.random() > 0.5 ? 1 : -1);
+    ball.speedY = speed1 * (Math.random() > 0.5 ? 1 : -1);
+}
+
+function update() {
+    // Déplacer les paddles
+    paddle1.y += paddle1.dy;
+    paddle2.y += paddle2.dy;
+
+    // Empêcher les paddles de sortir du canvas
+    if (paddle1.y < 0) paddle1.y = 0;
+    if (paddle1.y + paddle1.height > canvas.height) paddle1.y = canvas.height - paddle1.height;
+
+    if (paddle2.y < 0) paddle2.y = 0;
+    if (paddle2.y + paddle2.height > canvas.height) paddle2.y = canvas.height - paddle2.height;
+
+    // Déplacer la balle
+    ball.x += ball.speedX;
+    ball.y += ball.speedY;
+
+    // Collision avec le haut et le bas du canvas
+    if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+        ball.speedY *= -1;
     }
-    if (e.key==="Enter" && startState) {
-        startgame();
+
+    // Collision avec le paddle 1 (gauche)
+    if (
+        ball.x - ball.radius < paddle1.x + paddle1.width &&
+        ball.y > paddle1.y + paddle1.hitbox.offsetY &&
+        ball.y < paddle1.y + paddle1.height + paddle1.hitbox.offsetY
+    ) {
+        let relativeIntersectY = ball.y - (paddle1.y + paddle1.height / 2);
+        let normalizedRelativeIntersectionY = relativeIntersectY / (paddle1.height / 2);
+        let angle = normalizedRelativeIntersectionY * (Math.PI / 4);
+
+        let ballSpeed = Math.sqrt(ball.speedX ** 2 + ball.speedY ** 2);
+        ball.speedX = Math.abs(ballSpeed) * Math.cos(angle);
+        ball.speedY = ballSpeed * Math.sin(angle);
+    }
+
+    // Collision avec le paddle 2 (droite)
+    if (
+        ball.x + ball.radius > paddle2.x &&
+        ball.y > paddle2.y + paddle2.hitbox.offsetY &&
+        ball.y < paddle2.y + paddle2.height + paddle2.hitbox.offsetY
+    ) {
+        let relativeIntersectY = ball.y - (paddle2.y + paddle2.height / 2);
+        let normalizedRelativeIntersectionY = relativeIntersectY / (paddle2.height / 2);
+        let angle = normalizedRelativeIntersectionY * (Math.PI / 4);
+
+        let ballSpeed = Math.sqrt(ball.speedX ** 2 + ball.speedY ** 2);
+        ball.speedX = -Math.abs(ballSpeed) * Math.cos(angle);
+        ball.speedY = ballSpeed * Math.sin(angle);
+    }
+
+    // Si la balle sort à gauche (point pour le joueur 2)
+    if (ball.x - ball.radius < 0) {
+        score2++;
+        resetBall();
+    }
+
+    // Si la balle sort à droite (point pour le joueur 1)
+    if (ball.x + ball.radius > canvas.width) {
+        score1++;
+        resetBall();
+    }
+
+    // Vérifier si un joueur a atteint 10 points
+    if (score1 === 10 || score2 === 10) {
+        gameOver = true;
+        replayButton.style.display = "block"; // Afficher le bouton "Rejouer"
+    }
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Dessiner les paddles
+    drawRect(paddle1.x, paddle1.y, paddle1.width, paddle1.height, paddle1.color);
+    drawRect(paddle2.x, paddle2.y, paddle2.width, paddle2.height, paddle2.color);
+
+    // Dessiner la balle
+    drawCircle(ball.x, ball.y, ball.radius, ball.color);
+
+    // Afficher les scores
+    ctx.font = "24px Arial";
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.fillText("Joueur 1: " + score1, canvas.width / 4, 30);
+    ctx.fillText("Joueur 2: " + score2, (canvas.width / 4) * 3, 30);
+
+    // Afficher le message de fin de partie
+    if (gameOver) {
+        ctx.font = "48px Arial";
+        ctx.fillStyle = "red";
+        ctx.fillText(
+            score1 === 10 ? "le Joueur 1 a gagné !" : "le Joueur 2 a gagné !",
+            canvas.width / 2,
+            canvas.height / 2
+        );
     }
 }
 
@@ -109,112 +211,6 @@ function drawCircle(x, y, r, color) {
     ctx.fill();
 }
 
-function resetBall() {
-    ball.x = canvas.width / 2;
-    ball.y = canvas.height / 2;
-    ball.speedX = speed1 * (Math.random() > 0.5 ? 1 : -1);
-    ball.speedY = -speed1;
-}
-
-function spawnApple(apple) {
-    apple.x = Math.random() * (canvas.width - 50);
-    apple.y = Math.random() * (canvas.height - 50);
-}
-
-function spawnApples() {
-    apples.forEach(apple => {
-        spawnApple(apple);
-    });
-}
-
-function update() {
-    ball.x += ball.speedX;
-    ball.y += ball.speedY;
-
-    paddle.speed = speed1;
-
-    paddle.x += paddle.dx;
-
-    if (paddle.x < 0) paddle.x = 0;
-    if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
-
-    if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
-        ball.speedX *= -1;
-    }
-
-    if (ball.y - ball.radius < 0) {
-        ball.speedY *= -1;
-    }
-
-    // Collision avec la raquette avec modification de la direction en fonction de l'endroit de la collision
-    if (
-        ball.y + ball.radius > paddle.y &&
-        ball.x > paddle.x - paddleHitbox.offsetX &&
-        ball.x < paddle.x + paddle.width + paddleHitbox.offsetX
-    ) {
-        // Calcul de la position de collision sur la raquette
-        let relativeIntersectX = ball.x - (paddle.x + paddle.width / 2);
-        let normalizedRelativeIntersectionX = relativeIntersectX / (paddle.width / 2);
-        let angle = normalizedRelativeIntersectionX * (Math.PI / 4); // L'angle change en fonction de la collision sur la raquette
-
-        // Modifie la direction de la balle en fonction de l'angle
-        ball.speedX = (speed1*1.5) * Math.sin(angle);  // Augmente la vitesse horizontale en fonction de l'angle
-        ball.speedY = -Math.abs((speed1*1.5) * Math.cos(angle)); // La balle se dirige vers le haut avec une vitesse ajustée
-    }
-
-    if (ball.y + ball.radius > canvas.height) {
-        gameOver = true;
-        replayButton.style.display = "block"; // Afficher le bouton de redémarrage
-    }
-
-    // Collision avec la pomme
-    apples.forEach(apple => {
-        const dist = Math.sqrt((ball.x - apple.x) ** 2 + (ball.y - apple.y) ** 2);
-        if (dist < ball.radius + apple.radius) {
-            if (apple.color === "yellow") {
-                score += 3;
-            } else {
-                score++;
-            }
-
-            // Temporarily hide the apple and respawn it after 1 second
-            const appleToRespawn = apple;
-            appleToRespawn.x = -100; // Move it off-screen temporarily
-            appleToRespawn.y = -100;
-
-            setTimeout(() => {
-                spawnApple(apple);
-            }, 1000); // 1 second delay
-        }
-    });
-}
-
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Dessiner la raquette visible
-    drawRect(paddle.x, paddle.y, paddle.width, paddle.height, paddle.color);
-    drawCircle(ball.x, ball.y, ball.radius, ball.color);
-    apples.forEach(apple => {
-        drawCircle(apple.x, apple.y, apple.radius, apple.color);
-    });
-
-    // Afficher le score
-    ctx.font = "24px Arial";
-    ctx.fillStyle = "white";
-    ctx.textAlign = "left"; // Align text to the left
-    ctx.textBaseline = "top"; // Align text to the top
-    ctx.fillText("Score: " + score, 10, 10); // Add padding (e.g., 10px from the top-left corner)
-
-    // Afficher "You Lose" si le jeu est terminé
-    if (gameOver) {
-        ctx.font = "48px Arial";
-        ctx.fillStyle = "red";
-        ctx.textAlign = "center";
-        ctx.fillText("You Lose", canvas.width / 2, canvas.height / 2);
-    }
-}
-
 function gameLoop() {
     if (!gameOver) {
         update();
@@ -223,16 +219,20 @@ function gameLoop() {
     }
 }
 
-function restartGame() {
-    speed1 = parseInt(speedSlider.value); // Mettre à jour la vitesse
-    score = 0;
+function startgame() {
+    speed1 = parseInt(speedSlider.value);
+    startButton.style.display = "none";
+    startState = false;
     resetBall();
-    spawnApples();
-    gameOver = false;
-    replayButton.style.display = "none"; // Cacher le bouton de redémarrage
-    gameLoop(); // Lancer la boucle de jeu
+    gameLoop();
 }
 
-
-replayButton.addEventListener("click", restartGame);
+replayButton.addEventListener("click", function () {
+    score1 = 0;
+    score2 = 0;
+    resetBall();
+    gameOver = false;
+    replayButton.style.display = "none"; // Cacher le bouton "Rejouer"
+    gameLoop();
+});
 
