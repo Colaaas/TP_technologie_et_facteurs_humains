@@ -179,9 +179,9 @@ function update() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Dessiner les paddles
-    drawRect(paddle1.x, paddle1.y, paddle1.width, paddle1.height, paddle1.color);
-    drawRect(paddle2.x, paddle2.y, paddle2.width, paddle2.height, paddle2.color);
+    // Dessiner les paddles avec des coins arrondis
+    drawRect(paddle1.x, paddle1.y, paddle1.width, paddle1.height, paddle1.color, false, true); // Coins arrondis à gauche
+    drawRect(paddle2.x, paddle2.y, paddle2.width, paddle2.height, paddle2.color, true, false); // Coins arrondis à droite
 
     // Dessiner la balle
     drawCircle(ball.x, ball.y, ball.radius, ball.color);
@@ -204,9 +204,33 @@ function draw() {
     }
 }
 
-function drawRect(x, y, w, h, color) {
+function drawRect(x, y, w, h, color, roundLeft = false, roundRight = false) {
     ctx.fillStyle = color;
-    ctx.fillRect(x, y, w, h);
+    ctx.beginPath();
+
+    // Dessiner un rectangle avec des coins arrondis
+    if (roundLeft) {
+        ctx.moveTo(x + 10, y); // Coin supérieur gauche arrondi
+        ctx.arcTo(x, y, x, y + 10, 10);
+        ctx.lineTo(x, y + h - 10);
+        ctx.arcTo(x, y + h, x + 10, y + h, 10); // Coin inférieur gauche arrondi
+        ctx.lineTo(x + w, y + h);
+        ctx.lineTo(x + w, y);
+        ctx.closePath();
+    } else if (roundRight) {
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + w - 10, y);
+        ctx.arcTo(x + w, y, x + w, y + 10, 10); // Coin supérieur droit arrondi
+        ctx.lineTo(x + w, y + h - 10);
+        ctx.arcTo(x + w, y + h, x + w - 10, y + h, 10); // Coin inférieur droit arrondi
+        ctx.lineTo(x, y + h);
+        ctx.closePath();
+    } else {
+        // Rectangle normal
+        ctx.rect(x, y, w, h);
+    }
+
+    ctx.fill();
 }
 
 function drawCircle(x, y, r, color) {
