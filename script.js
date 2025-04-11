@@ -10,7 +10,7 @@ canvas.height = 600;
 
 startState = true;
 
-let speed1 = parseInt(speedSlider.value); // Vitesse par défaut de la balle
+let speed1 = parseInt(speedSlider.value);
 
 speedSlider.addEventListener("input", function () {
     speed1 = parseInt(speedSlider.value);
@@ -27,7 +27,7 @@ const paddle1 = {
     x: 20, // Position à gauche
     y: canvas.height / 2 - 50,
     color: "white",
-    speed: speed1 + 0.8,
+    speed: speed1 + 1.2,
     dy: 0, // Vitesse verticale
     hitbox: {
         width: 10,
@@ -65,23 +65,25 @@ let score1 = 0; // Score du joueur 1
 let score2 = 0; // Score du joueur 2
 let gameOver = false;
 
-document.addEventListener("keydown", movePaddles);
-document.addEventListener("keyup", stopPaddles);
+document.addEventListener("keydown", function (e) {
+    // Empêcher les flèches haut et bas de modifier le slider
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        e.preventDefault();
+    }
 
-function movePaddles(e) {
     // Joueur 2 (flèches haut et bas)
     if (e.key === "ArrowUp") {
         paddle2.dy = -paddle2.speed;
     } else if (e.key === "ArrowDown") {
         paddle2.dy = paddle2.speed;
     }
-}
+});
 
-function stopPaddles(e) {
+document.addEventListener("keyup", function (e) {
     if (e.key === "ArrowUp" || e.key === "ArrowDown") {
         paddle2.dy = 0;
     }
-}
+});
 
 function resetBall() {
     ball.x = canvas.width / 2;
@@ -91,8 +93,16 @@ function resetBall() {
 }
 
 function update() {
+    // Mettre à jour la vitesse de la balle en fonction du slider
+    let ballSpeed = parseInt(speedSlider.value);
+
+    // Normaliser la vitesse de la balle tout en conservant sa direction
+    let currentSpeed = Math.sqrt(ball.speedX ** 2 + ball.speedY ** 2);
+    ball.speedX = (ball.speedX / currentSpeed) * ballSpeed;
+    ball.speedY = (ball.speedY / currentSpeed) * ballSpeed;
+
     // Déplacer le bot (paddle1)
-    let botSpeed = 1.5; // Vitesse maximale du bot
+    let botSpeed = ballSpeed * 0.53; // Vitesse maximale du bot
     if (ball.y < paddle1.y + paddle1.height / 2) {
         paddle1.y -= botSpeed; // Déplacer vers le haut
     } else if (ball.y > paddle1.y + paddle1.height / 2) {
@@ -129,7 +139,6 @@ function update() {
         let normalizedRelativeIntersectionY = relativeIntersectY / (paddle1.height / 2);
         let angle = normalizedRelativeIntersectionY * (Math.PI / 4);
 
-        let ballSpeed = Math.sqrt(ball.speedX ** 2 + ball.speedY ** 2);
         ball.speedX = Math.abs(ballSpeed) * Math.cos(angle);
         ball.speedY = ballSpeed * Math.sin(angle);
     }
@@ -144,7 +153,6 @@ function update() {
         let normalizedRelativeIntersectionY = relativeIntersectY / (paddle2.height / 2);
         let angle = normalizedRelativeIntersectionY * (Math.PI / 4);
 
-        let ballSpeed = Math.sqrt(ball.speedX ** 2 + ball.speedY ** 2);
         ball.speedX = -Math.abs(ballSpeed) * Math.cos(angle);
         ball.speedY = ballSpeed * Math.sin(angle);
     }
@@ -179,18 +187,17 @@ function draw() {
     drawCircle(ball.x, ball.y, ball.radius, ball.color);
 
     // Afficher les scores
-    ctx.font = "24px Arial";
+    ctx.font = "32px Arial";
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
-    ctx.fillText("Joueur 1: " + score1, canvas.width / 4, 30);
-    ctx.fillText("Joueur 2: " + score2, (canvas.width / 4) * 3, 30);
+    ctx.fillText(score1 + "  |  " + score2, canvas.width / 2, 40);
 
     // Afficher le message de fin de partie
     if (gameOver) {
         ctx.font = "48px Arial";
-        ctx.fillStyle = "red";
+        ctx.fillStyle = "skyblue";
         ctx.fillText(
-            score1 === 10 ? "le Joueur 1 a gagné !" : "le Joueur 2 a gagné !",
+            score1 === 10 ? "L'ordinateur a gagné !" : "Vous avez gagné !",
             canvas.width / 2,
             canvas.height / 2
         );
