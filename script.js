@@ -69,13 +69,6 @@ document.addEventListener("keydown", movePaddles);
 document.addEventListener("keyup", stopPaddles);
 
 function movePaddles(e) {
-    // Joueur 1 (z et s)
-    if (e.key === "z") {
-        paddle1.dy = -paddle1.speed;
-    } else if (e.key === "s") {
-        paddle1.dy = paddle1.speed;
-    }
-
     // Joueur 2 (flèches haut et bas)
     if (e.key === "ArrowUp") {
         paddle2.dy = -paddle2.speed;
@@ -85,9 +78,6 @@ function movePaddles(e) {
 }
 
 function stopPaddles(e) {
-    if (e.key === "z" || e.key === "s") {
-        paddle1.dy = 0;
-    }
     if (e.key === "ArrowUp" || e.key === "ArrowDown") {
         paddle2.dy = 0;
     }
@@ -101,14 +91,22 @@ function resetBall() {
 }
 
 function update() {
-    // Déplacer les paddles
-    paddle1.y += paddle1.dy;
-    paddle2.y += paddle2.dy;
+    // Déplacer le bot (paddle1)
+    let botSpeed = 4; // Vitesse maximale du bot
+    if (ball.y < paddle1.y + paddle1.height / 2) {
+        paddle1.y -= botSpeed; // Déplacer vers le haut
+    } else if (ball.y > paddle1.y + paddle1.height / 2) {
+        paddle1.y += botSpeed; // Déplacer vers le bas
+    }
 
-    // Empêcher les paddles de sortir du canvas
+    // Empêcher le bot de sortir du canvas
     if (paddle1.y < 0) paddle1.y = 0;
     if (paddle1.y + paddle1.height > canvas.height) paddle1.y = canvas.height - paddle1.height;
 
+    // Déplacer les paddles
+    paddle2.y += paddle2.dy;
+
+    // Empêcher le paddle 2 de sortir du canvas
     if (paddle2.y < 0) paddle2.y = 0;
     if (paddle2.y + paddle2.height > canvas.height) paddle2.y = canvas.height - paddle2.height;
 
