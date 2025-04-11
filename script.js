@@ -27,12 +27,12 @@ const paddle1 = {
     x: 20, // Position à gauche
     y: canvas.height / 2 - 50,
     color: "white",
-    speed: speed1 + 1.2,
+    speed: speed1 + 0.8,
     dy: 0, // Vitesse verticale
     hitbox: {
         width: 10,
-        height: 120, // Hitbox légèrement plus grande
-        offsetY: -10 // Décalage vertical pour centrer la hitbox
+        height: 130, // Hitbox légèrement plus grande
+        offsetY: -15 // Décalage vertical pour centrer la hitbox
     }
 };
 
@@ -47,8 +47,8 @@ const paddle2 = {
     dy: 0, // Vitesse verticale
     hitbox: {
         width: 10,
-        height: 120, // Hitbox légèrement plus grande
-        offsetY: -10 // Décalage vertical pour centrer la hitbox
+        height: 130, // Hitbox légèrement plus grande
+        offsetY: -15 // Décalage vertical pour centrer la hitbox
     }
 };
 
@@ -92,7 +92,7 @@ function resetBall() {
 
 function update() {
     // Déplacer le bot (paddle1)
-    let botSpeed = 4; // Vitesse maximale du bot
+    let botSpeed = 1.5; // Vitesse maximale du bot
     if (ball.y < paddle1.y + paddle1.height / 2) {
         paddle1.y -= botSpeed; // Déplacer vers le haut
     } else if (ball.y > paddle1.y + paddle1.height / 2) {
