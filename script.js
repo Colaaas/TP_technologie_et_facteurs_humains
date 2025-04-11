@@ -102,7 +102,7 @@ function update() {
     ball.speedY = (ball.speedY / currentSpeed) * ballSpeed;
 
     // Déplacer le bot (paddle1)
-    let botSpeed = ballSpeed * 0.53; // Vitesse maximale du bot
+    let botSpeed = ballSpeed * 0.48; // Vitesse maximale du bot
     if (ball.y < paddle1.y + paddle1.height / 2) {
         paddle1.y -= botSpeed; // Déplacer vers le haut
     } else if (ball.y > paddle1.y + paddle1.height / 2) {
