@@ -1,6 +1,6 @@
 Pong EMG + EDA 
 
-            Etapes pour préparer et faire foncGonner adéquatement le projet
+            Etapes pour préparer et faire fonctionner adéquatement le projet
 
 Ce projet consiste en un jeu interactif de Pong où les raquettes sont contrôlées par les signaux bioélectriques de l'utilisateur, à savoir les signaux EMG (activité musculaire) et EDA (réponse électrodermale). Ce jeu est alimenté par des données capturées par un dispositif BITalino.
 Fonctionnement du projet
